@@ -1,11 +1,12 @@
 #include <stdio.h>
+#include <inttypes.h>
 
-int options(int argc, char *argv[]);
+#include "options.h"
 
 int main(int argc, char *argv[])
 {
     int ret;
-    int c;
+    uint8_t png_sing[8] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a}, c[8];
 
     ret = options(argc, argv);
     if (ret != 0)
@@ -19,23 +20,11 @@ int main(int argc, char *argv[])
 	return 1;
     }
 
-    do{
-	c = fgetc(img);
+    fseek(img, 0, SEEK_SET);
+    fread(&c, sizeof(uint8_t), 8, img);
 
-	if (c != EOF)
-	    printf("%x\n", c);
-
-    }while(c != EOF);
-
+    printf("%d", memcmp(png_sing, c, 8));
 
     fclose(img);
 
-}
-
-int options(int argc, char *argv[])
-{
-    if (argc != 2)
-	return 1;
-
-    return 0;
 }
