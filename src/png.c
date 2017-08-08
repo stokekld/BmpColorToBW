@@ -20,27 +20,57 @@ int isPngFile(FILE *file)
 
 void get_chunks(FILE *file)
 {
-    int i;
-    int length;
-    uint8_t buffer[4], type[4], CRC[4];
+    Layout *l;
+    int offset = 8, iend;
 
-    fseek(file, 8, SEEK_SET);
 
     do
     {
-	fread(buffer, sizeof(uint8_t), 4, file);
+	l = (Layout *) malloc(sizeof(Layout));
+	offset += get_layout(l, file, offset);
+	printf("%c%c%c%c\n", l->type[0],l->type[1],l->type[2],l->type[3]);
+	iend = memcmp(IEND, l->type, 4);
+	free_layout(l);
 
-	length = get_length(buffer);
+    }while(iend != 0);
 
-	fread(type, sizeof(uint8_t), 4, file);
-	printf("%d %s\n", length, type);
+}
 
-	fseek(file, length, SEEK_CUR);
+void free_layout(Layout *l)
+{
+    free(l->length);
+    free(l->type);
+    free(l->data);
+    free(l->crc);
 
-	fread(CRC, sizeof(uint8_t), 4, file);
-	/*printf("%x", CRC[3]);*/
-    }while(memcmp(IEND, type, 4) != 0);
+    free(l);
+    
+}
 
+int get_layout(Layout *l, FILE *file, int offset)
+{
+    int data_len, layout_len;
+    uint8_t buffer[4];
+
+    fseek(file, offset, SEEK_SET);
+
+    fread(buffer, sizeof(uint8_t), 4, file);
+    data_len = get_length(buffer);
+    layout_len = 4 + 4 + data_len + 4;
+
+    fseek(file, offset, SEEK_SET);
+
+    l->length = malloc(sizeof(uint8_t)*4);
+    l->type = malloc(sizeof(uint8_t)*4);
+    l->data = malloc(sizeof(uint8_t)*data_len);
+    l->crc = malloc(sizeof(uint8_t)*4);
+
+    fread(l->length, sizeof(uint8_t), 4, file);
+    fread(l->type, sizeof(uint8_t), 4, file);
+    fread(l->data, data_len, 1, file);
+    fread(l->crc, sizeof(uint8_t), 4, file); 
+
+    return layout_len;
 }
 
 int get_length(uint8_t *buffer)
