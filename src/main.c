@@ -25,6 +25,8 @@ int main(int argc, char *argv[])
 	return 1;
     }
 
+    get_chunks(img);
+
     fclose(img);
 
 }
