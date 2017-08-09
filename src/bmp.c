@@ -3,31 +3,48 @@ uint8_t bmp_sign[2] = {0x42, 0x4d};
 
 int bmp(FILE *file)
 {
-    BMPHeader *header;
+    BMPHeader header;
+    IHeader iheader;
+    Pixel px;
 
-    header = malloc(sizeof(BMPHeader));
+    get_header(&header, file);
+    get_iHeader(&iheader, file);
+    get_pixel(&px, file);
 
-    get_header(header, file);
+    printf("%d,", px.red);
+    printf("%d,", px.green);
+    printf("%d", px.blue);
 
-    printf("%s", header->type);
+}
+void get_pixel(Pixel *px, FILE *file)
+{
+    fseek(file, 54, SEEK_SET);
 
+    fread(&(px->red), sizeof(uint8_t), 1, file);
+    fread(&(px->green), sizeof(uint8_t), 1, file);
+    fread(&(px->blue), sizeof(uint8_t), 1, file);
 }
 
 void get_header(BMPHeader *header, FILE *file)
 {
-    header->type = malloc(sizeof(uint8_t) * 2);
-    header->size= malloc(sizeof(uint8_t) * 4);
-    header->reserved1 = malloc(sizeof(uint8_t) * 2);
-    header->reserved2 = malloc(sizeof(uint8_t) * 2);
-    header->offset = malloc(sizeof(uint8_t) * 4);
-
     fseek(file, 0, SEEK_SET);
 
     fread(header->type, sizeof(uint8_t), 2, file);
-    fread(header->size, sizeof(uint8_t), 4, file);
+    fread(&(header->size), sizeof(uint32_t), 1, file);
     fread(header->reserved1, sizeof(uint8_t), 2, file);
     fread(header->reserved2, sizeof(uint8_t), 2, file);
-    fread(header->offset, sizeof(uint8_t), 4, file);
+    fread(&(header->offset), sizeof(uint32_t), 1, file);
+}
+
+void get_iHeader(IHeader *header, FILE *file)
+{
+    fseek(file, 14, SEEK_SET);
+
+    fread(&(header->size), sizeof(uint32_t), 1, file);
+    fread(&(header->width), sizeof(uint32_t), 1, file);
+    fread(&(header->height), sizeof(uint32_t), 1, file);
+    fread(&(header->planes), sizeof(uint16_t), 1, file);
+    fread(&(header->count), sizeof(uint16_t), 1, file);
 }
 
 int isBmpImage(FILE *file)
