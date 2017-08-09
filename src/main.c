@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #include "options.h"
-#include "png.h"
+#include "bmp.h"
 
 int main(int argc, char *argv[])
 {
@@ -19,13 +19,13 @@ int main(int argc, char *argv[])
 	return 1;
     }
 
-    if (isPngFile(img) != 0)
+    if (isBmpImage(img) != 0)
     {
-	perror("No es un archivo con formato PNG.");
+	perror("No es un archivo con formato BMP.");
 	return 1;
     }
 
-    get_chunks(img);
+    ret = bmp(img);
 
     fclose(img);
 
