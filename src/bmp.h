@@ -2,6 +2,7 @@
 #include <inttypes.h>
 #include <stdlib.h>
 
+// Estructura header del archivo BMP
 typedef struct {
     uint8_t type[2];
     uint32_t size;
@@ -10,6 +11,7 @@ typedef struct {
     uint32_t offset;
 } BMPHeader;
 
+// Estructura header de la imagen
 typedef struct {
     uint32_t size;
     uint32_t width;
@@ -18,6 +20,7 @@ typedef struct {
     uint16_t count;
 } IHeader;
 
+// Estructura para pixel
 typedef struct {
     uint8_t red;
     uint8_t green;

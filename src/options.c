@@ -1,5 +1,6 @@
 #include "options.h"
 
+// Verifica que manda la ruta del archivo bmp
 int options(int argc, char *argv[])
 {
     if (argc != 2)

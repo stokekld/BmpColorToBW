@@ -1,6 +1,9 @@
 #include "bmp.h"
+
+// Firma de archivo bmp
 uint8_t bmp_sign[2] = {0x42, 0x4d};
 
+// funcion principal
 int bmp(FILE *file)
 {
     BMPHeader header;
@@ -16,6 +19,8 @@ int bmp(FILE *file)
     printf("%d", px.blue);
 
 }
+
+// Funcion para obtener pixel
 void get_pixel(Pixel *px, FILE *file)
 {
     fseek(file, 54, SEEK_SET);
@@ -25,6 +30,7 @@ void get_pixel(Pixel *px, FILE *file)
     fread(&(px->blue), sizeof(uint8_t), 1, file);
 }
 
+// Funcion para obtener header del archivo
 void get_header(BMPHeader *header, FILE *file)
 {
     fseek(file, 0, SEEK_SET);
@@ -36,6 +42,7 @@ void get_header(BMPHeader *header, FILE *file)
     fread(&(header->offset), sizeof(uint32_t), 1, file);
 }
 
+// Funcion para obtener header de la imagen
 void get_iHeader(IHeader *header, FILE *file)
 {
     fseek(file, 14, SEEK_SET);
@@ -47,6 +54,7 @@ void get_iHeader(IHeader *header, FILE *file)
     fread(&(header->count), sizeof(uint16_t), 1, file);
 }
 
+// Funcion para verificar que es una archivo bmp
 int isBmpImage(FILE *file)
 {
     uint8_t sign[2];
