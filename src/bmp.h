@@ -38,5 +38,6 @@ int bmp(FILE *file);
 void get_header(BMPHeader *header, FILE *file);
 int isBmpImage(FILE *file);
 void get_iHeader(IHeader *header, FILE *file);
-void get_matrix(Pixel *px, FILE *file, int pixels);
-void dumb_file(BMPHeader * header, IHeader *iheader, Pixel *matrix, int pixels);
+void get_matrix(Pixel *px, FILE *file, int pixels, int width, int nullbts);
+void dumb_file(BMPHeader * header, IHeader *iheader, Pixel *matrix, int pixels, int width, int nullbts);
+int num_null_bytes(int width);

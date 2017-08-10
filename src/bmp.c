@@ -2,11 +2,12 @@
 
 // Firma de archivo bmp
 uint8_t bmp_sign[2] = {0x42, 0x4d};
+uint8_t nullchar = 0x00;
 
 // funcion principal
 int bmp(FILE *file)
 {
-    int i;
+    int nullbts;
     BMPHeader header;
     IHeader iheader;
     Pixel *matrix;
@@ -14,24 +15,19 @@ int bmp(FILE *file)
     get_header(&header, file);
     get_iHeader(&iheader, file);
 
+    nullbts = num_null_bytes(iheader.width);
+
     matrix = malloc(sizeof(Pixel) * iheader.width * iheader.height);
 
-    get_matrix(matrix, file, iheader.width * iheader.height);
+    get_matrix(matrix, file, iheader.width * iheader.height, iheader.width, nullbts);
 
-    dumb_file(&header, &iheader, matrix, iheader.width * iheader.height);
-
-    /*for (i = 0; i < (iheader.width * iheader.height); i++)*/
-    /*{*/
-	/*printf("%x,", (matrix + i)->red);*/
-	/*printf("%x,", (matrix + i)->green);*/
-	/*printf("%x\n", (matrix + i)->blue);*/
-    /*}*/
+    dumb_file(&header, &iheader, matrix, iheader.width * iheader.height, iheader.width, nullbts);
 
 }
 
-void dumb_file(BMPHeader * header, IHeader *iheader, Pixel *matrix, int pixels)
+void dumb_file(BMPHeader * header, IHeader *iheader, Pixel *matrix, int pixels, int width, int nullbts)
 {
-    int i;
+    int i, row = 1;
     uint8_t greyscale;
     FILE *output;
     Pixel *aux;
@@ -63,16 +59,25 @@ void dumb_file(BMPHeader * header, IHeader *iheader, Pixel *matrix, int pixels)
 	fwrite(&(greyscale), sizeof(uint8_t), 1, output);
 	fwrite(&(greyscale), sizeof(uint8_t), 1, output);
 	fwrite(&(greyscale), sizeof(uint8_t), 1, output);
+
+	if(row == width)
+	{
+	    fwrite(&nullchar, sizeof(uint8_t), nullbts, output);
+	    row = 0;
+	}
+
+	row++;
     }
 
     fclose(output);
 }
 
 // Funcion para obtener pixel
-void get_matrix(Pixel *px, FILE *file, int pixels)
+void get_matrix(Pixel *px, FILE *file, int pixels, int width, int nullbts)
 {
-    int i;
+    int i, row = 1;
     Pixel *aux;
+    
 
     fseek(file, 54, SEEK_SET);
     
@@ -82,6 +87,14 @@ void get_matrix(Pixel *px, FILE *file, int pixels)
 	fread(&(aux->red), sizeof(uint8_t), 1, file);
 	fread(&(aux->green), sizeof(uint8_t), 1, file);
 	fread(&(aux->blue), sizeof(uint8_t), 1, file);
+
+	if (row == width)
+	{
+	    fseek(file, nullbts, SEEK_CUR);
+	    row = 0;
+	}
+
+	row++;
     }
 }
 
@@ -127,4 +140,18 @@ int isBmpImage(FILE *file)
 	return 1;
 
     return 0;
+}
+
+int num_null_bytes(int width)
+{
+    int nullbytes = 0;
+    width *= 3;
+
+    while(width % 4 != 0)
+    {
+	nullbytes++;
+	width++;
+    }
+
+    return nullbytes;
 }
