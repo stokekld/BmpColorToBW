@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 #include <stdlib.h>
+#include <string.h>
 
 // Estructura header del archivo BMP
 typedef struct {
@@ -18,6 +19,12 @@ typedef struct {
     uint32_t height;
     uint16_t planes;
     uint16_t count;
+    uint32_t compres;
+    uint32_t sizeImg;
+    uint32_t pxxm;
+    uint32_t pxym;
+    uint32_t colorMap;
+    uint32_t colorImp;
 } IHeader;
 
 // Estructura para pixel
@@ -31,4 +38,5 @@ int bmp(FILE *file);
 void get_header(BMPHeader *header, FILE *file);
 int isBmpImage(FILE *file);
 void get_iHeader(IHeader *header, FILE *file);
-void get_pixel(Pixel *px, FILE *file);
+void get_matrix(Pixel *px, FILE *file, int pixels);
+void dumb_file(BMPHeader * header, IHeader *iheader, Pixel *matrix, int pixels);
