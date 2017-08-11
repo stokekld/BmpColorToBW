@@ -45,7 +45,7 @@ int bmp(FILE *file)
     get_matrix(matrix, file, iheader.height, iheader.width, nullbts);
 
     // Convirtiendo a blanco y negro
-    /*ctobw(&matrix, iheader.width * iheader.height);*/
+    ctobw(&matrix, iheader.width * iheader.height);
 
     // Mandando datos al archivo
     dumb_file(&header, &iheader, matrix, iheader.height, iheader.width, nullbts);
