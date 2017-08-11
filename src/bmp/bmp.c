@@ -1,0 +1,53 @@
+#include <stdlib.h>
+
+#include "bmp.h"
+#include "headers.h"
+#include "tools.h"
+#include "output.h"
+
+// funcion principal
+int bmp(FILE *file)
+{
+    int nullbts;
+    BMPHeader header;
+    IHeader iheader;
+    Pixel *matrix;
+
+    // Verificando que sea una imagen bmp
+    if (isBmpImage(file) != 0)
+    {
+	perror("No es un archivo con formato BMP.");
+	return 1;
+    }
+
+    get_header(&header, file);
+
+    printf("Tamaño de imagen (bytes):\t%d\n", header.size);
+
+    get_iHeader(&iheader, file);
+
+    printf("Ancho de imagen (px):\t\t%d\n", iheader.width);
+    printf("Alto de imagen (px):\t\t%d\n", iheader.height);
+    printf("Bits por px:\t\t\t%d\n", iheader.count);
+
+    if (iheader.count != 24)
+    {
+	perror("Este comando solo funciona con imagenes de 24 bits por px.");
+    }
+
+    // Obtencion de bytes null por fila
+    nullbts = num_null_bytes(iheader.width);
+
+    // Dando espacio a la matriz
+    matrix = malloc(sizeof(Pixel) * iheader.width * iheader.height);
+
+    // Obtencion de matriz de pixele	// Obtencion de matriz de pixeless
+    get_matrix(matrix, file, iheader.width * iheader.height, iheader.width, nullbts);
+
+    // Convirtiendo a blanco y negro
+    ctobw(&matrix, iheader.width * iheader.height);
+
+    // Mandando datos al archivo
+    dumb_file(&header, &iheader, matrix, iheader.width * iheader.height, iheader.width, nullbts);
+
+}

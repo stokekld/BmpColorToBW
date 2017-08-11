@@ -1,10 +1,14 @@
 #include <stdio.h>
+#include <time.h>
 
 #include "options.h"
 #include "bmp.h"
 
 int main(int argc, char *argv[])
 {
+    // Tamando el tiempo
+    clock_t begin = clock();
+
     int ret;
 
     // Verificando opciones del comando
@@ -21,16 +25,16 @@ int main(int argc, char *argv[])
 	return 1;
     }
 
-    // Verificando que sea una imagen bmp
-    if (isBmpImage(img) != 0)
-    {
-	perror("No es un archivo con formato BMP.");
-	return 1;
-    }
-
     // Aplicando 
     ret = bmp(img);
+    if (ret != 0)
+	return 1;
 
     fclose(img);
 
+    clock_t end = clock();
+
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+
+    printf("Tiempo de ejecucion (s):\t%f\n", time_spent);
 }
