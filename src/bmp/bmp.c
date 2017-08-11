@@ -42,12 +42,14 @@ int bmp(FILE *file)
     matrix = malloc(sizeof(Pixel) * iheader.width * iheader.height);
 
     // Obtencion de matriz de pixele	// Obtencion de matriz de pixeless
-    get_matrix(matrix, file, iheader.width * iheader.height, iheader.width, nullbts);
+    get_matrix(matrix, file, iheader.height, iheader.width, nullbts);
 
     // Convirtiendo a blanco y negro
-    ctobw(&matrix, iheader.width * iheader.height);
+    /*ctobw(&matrix, iheader.width * iheader.height);*/
 
     // Mandando datos al archivo
-    dumb_file(&header, &iheader, matrix, iheader.width * iheader.height, iheader.width, nullbts);
+    dumb_file(&header, &iheader, matrix, iheader.height, iheader.width, nullbts);
+
+    free(matrix);
 
 }

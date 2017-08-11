@@ -7,9 +7,9 @@
 
 uint8_t nullchar = 0x00;
 
-void dumb_file(BMPHeader * header, IHeader *iheader, Pixel *matrix, int pixels, int width, int nullbts)
+void dumb_file(BMPHeader * header, IHeader *iheader, Pixel *matrix, int high, int width, int nullbts)
 {
-    int i, row = 1;
+    int i, j;
     FILE *output;
     Pixel *aux;
 
@@ -33,21 +33,22 @@ void dumb_file(BMPHeader * header, IHeader *iheader, Pixel *matrix, int pixels, 
     fwrite(&(iheader->colorMap), sizeof(uint32_t), 1, output);
     fwrite(&(iheader->colorImp), sizeof(uint32_t), 1, output);
 
-    for(i = 0; i < pixels; i++)
+    for (i = 0; i < high; i++)
     {
-	aux = matrix + i;
-	fwrite(&(aux->red), sizeof(uint8_t), 1, output);
-	fwrite(&(aux->green), sizeof(uint8_t), 1, output);
-	fwrite(&(aux->blue), sizeof(uint8_t), 1, output);
-
-	if(row == width)
-	{
+	if (i != 0)
 	    fwrite(&nullchar, sizeof(uint8_t), nullbts, output);
-	    row = 0;
-	}
 
-	row++;
+	for (j = 0; j < width; j++)
+	{
+	    aux = matrix + (i * width) + j;
+
+	    fwrite(&(aux->red), sizeof(uint8_t), 1, output);
+	    fwrite(&(aux->green), sizeof(uint8_t), 1, output);
+	    fwrite(&(aux->blue), sizeof(uint8_t), 1, output);
+	}
     }
+
+    fwrite(&nullchar, sizeof(uint8_t), nullbts, output);
 
     fclose(output);
 }
