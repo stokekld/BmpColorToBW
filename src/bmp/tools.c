@@ -2,6 +2,7 @@
 #include <inttypes.h>
 #include <string.h>
 #include <math.h>
+#include <omp.h>
 
 #include "tools.h"
 
@@ -43,16 +44,20 @@ void ctobw(Pixel **matrix, int height, int width)
     uint8_t greyscale;
     Pixel *aux;
 
-    for (y = 0; y < height; y++)
-	for (x = 0; x < width; x++)
-	{
-	    aux = (*matrix) + y * width + x;
-	    greyscale = (aux->red + aux->green + aux->blue) / 3;
+    #pragma omp parallel private(x, aux)
+    {
+	#pragma omp for
+	for (y = 0; y < height; y++)
+	    for (x = 0; x < width; x++)
+	    {
+		aux = (*matrix) + y * width + x;
+		greyscale = (aux->red + aux->green + aux->blue) / 3;
 
-	    memcpy(&(aux->red), &greyscale, sizeof(uint8_t));
-	    memcpy(&(aux->green), &greyscale, sizeof(uint8_t));
-	    memcpy(&(aux->blue), &greyscale, sizeof(uint8_t));
-	}
+		memcpy(&(aux->red), &greyscale, sizeof(uint8_t));
+		memcpy(&(aux->green), &greyscale, sizeof(uint8_t));
+		memcpy(&(aux->blue), &greyscale, sizeof(uint8_t));
+	    }
+    }
 }
 
 void rotate(Pixel **output, Pixel *matrix, int degrees, int height, int width)
@@ -60,13 +65,17 @@ void rotate(Pixel **output, Pixel *matrix, int degrees, int height, int width)
     int cx = width/2, cy = height/2, x, y, xn, yn;
     double radians = (degrees * 3.14159) / 180;
 
-    for (y = 0; y < height; y++)
-	for (x = 0; x < width; x++)
-	{
-	    xn = cos(radians) * (x - cx) - sin(radians) * (y - cy) + cx;
-	    yn = sin(radians) * (x - cx) + cos(radians) * (y - cy) + cy;
+    #pragma omp parallel private(x, xn, yn)
+    {
+	#pragma omp for
+	for (y = 0; y < height; y++)
+	    for (x = 0; x < width; x++)
+	    {
+		xn = cos(radians) * (x - cx) - sin(radians) * (y - cy) + cx;
+		yn = sin(radians) * (x - cx) + cos(radians) * (y - cy) + cy;
 
-	    if (xn <= width && xn >= 0 && yn <= height && yn >= 0)
-		memcpy(*output + yn * width + xn, matrix + y * width + x, sizeof(uint8_t) * 3);
-	}
+		if (xn <= width && xn >= 0 && yn <= height && yn >= 0)
+		    memcpy(*output + yn * width + xn, matrix + y * width + x, sizeof(uint8_t) * 3);
+	    }
+    }
 }

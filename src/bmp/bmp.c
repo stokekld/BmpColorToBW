@@ -52,6 +52,6 @@ int bmp(FILE *file)
     // Mandando datos al archivo
     dumb_file(&header, &iheader, output, iheader.height, iheader.width, nullbts);
 
-    free(matrix);
+    /*free(matrix);*/
 
 }

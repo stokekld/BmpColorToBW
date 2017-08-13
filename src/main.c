@@ -6,8 +6,6 @@
 
 int main(int argc, char *argv[])
 {
-    // Tamando el tiempo
-    clock_t begin = clock();
 
     int ret;
 
@@ -26,13 +24,17 @@ int main(int argc, char *argv[])
     }
 
     // Aplicando 
+    // Tamando el tiempo
+    clock_t begin = clock();
+
     ret = bmp(img);
+
+    clock_t end = clock();
     if (ret != 0)
 	return 1;
 
     fclose(img);
 
-    clock_t end = clock();
 
     double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
 
