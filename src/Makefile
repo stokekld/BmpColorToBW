@@ -37,7 +37,7 @@ $(HDS_O): $(HDS_C) $(HDS_H)
 	$(CC) -c $(HDS_C) -o $(HDS_O)
 
 $(TLS_O): $(TLS_C) $(TLS_H)
-	$(CC) -c $(TLS_C) -o $(TLS_O)
+	$(CC) -c $(TLS_C) -o $(TLS_O) -lm
 
 $(PXS_O): $(PXS_C) $(PXS_H)
 	$(CC) -c $(PXS_C) -o $(PXS_O)
@@ -46,7 +46,7 @@ $(OPT_O): $(OPT_C) $(OPT_H)
 	$(CC) -c $(OPT_C) -o $(OPT_O)
 
 $(MAIN_O): $(MAIN_C) $(OPTS_C) $(OPTS_H) $(BMP_O) $(HDS_O) $(TLS_O) $(PXS_O) $(OPT_O)
-	$(CC) -I $(BMP_DIR) -o $(MAIN_O) $(BMP_O) $(HDS_O) $(TLS_O) $(PXS_O) $(OPT_O) $(MAIN_C) $(OPTS_C)
+	$(CC) -I $(BMP_DIR) -o $(MAIN_O) $(BMP_O) $(HDS_O) $(TLS_O) $(PXS_O) $(OPT_O) $(MAIN_C) $(OPTS_C) -lm
 
 clean:
 	rm $(MAIN_O) $(BMP_O) $(HDS_O) $(TLS_O) $(PXS_O) $(OPT_O)
