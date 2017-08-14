@@ -44,20 +44,17 @@ void ctobw(Pixel **matrix, int height, int width)
     uint8_t greyscale;
     Pixel *aux;
 
-    #pragma omp parallel private(x, aux)
-    {
-	#pragma omp for
-	for (y = 0; y < height; y++)
-	    for (x = 0; x < width; x++)
-	    {
-		aux = (*matrix) + y * width + x;
-		greyscale = (aux->red + aux->green + aux->blue) / 3;
+    for (y = 0; y < height; y++)
+	#pragma omp for private (x, aux, greyscale)
+	for (x = 0; x < width; x++)
+	{
+	    aux = (*matrix) + y * width + x;
+	    greyscale = (aux->red + aux->green + aux->blue) / 3;
 
-		memcpy(&(aux->red), &greyscale, sizeof(uint8_t));
-		memcpy(&(aux->green), &greyscale, sizeof(uint8_t));
-		memcpy(&(aux->blue), &greyscale, sizeof(uint8_t));
-	    }
-    }
+	    memcpy(&(aux->red), &greyscale, sizeof(uint8_t));
+	    memcpy(&(aux->green), &greyscale, sizeof(uint8_t));
+	    memcpy(&(aux->blue), &greyscale, sizeof(uint8_t));
+	}
 }
 
 void rotate(Pixel **output, Pixel *matrix, int degrees, int height, int width)
@@ -65,10 +62,8 @@ void rotate(Pixel **output, Pixel *matrix, int degrees, int height, int width)
     int cx = width/2, cy = height/2, x, y, xn, yn;
     double radians = (degrees * 3.14159) / 180;
 
-    #pragma omp parallel private(x, xn, yn)
-    {
-	#pragma omp for
 	for (y = 0; y < height; y++)
+	    #pragma omp for private (x, xn, yn)
 	    for (x = 0; x < width; x++)
 	    {
 		xn = cos(radians) * (x - cx) - sin(radians) * (y - cy) + cx;
@@ -77,5 +72,4 @@ void rotate(Pixel **output, Pixel *matrix, int degrees, int height, int width)
 		if (xn <= width && xn >= 0 && yn <= height && yn >= 0)
 		    memcpy(*output + yn * width + xn, matrix + y * width + x, sizeof(uint8_t) * 3);
 	    }
-    }
 }

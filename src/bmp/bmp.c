@@ -47,7 +47,7 @@ int bmp(FILE *file)
 
     // Convirtiendo a blanco y negro
     ctobw(&matrix, iheader.height, iheader.width);
-    rotate(&output, matrix, 90, iheader.height, iheader.width);
+    rotate(&output, matrix, 180, iheader.height, iheader.width);
 
     // Mandando datos al archivo
     dumb_file(&header, &iheader, output, iheader.height, iheader.width, nullbts);
